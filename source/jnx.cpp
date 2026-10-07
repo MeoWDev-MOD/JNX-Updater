@@ -124,6 +124,39 @@ namespace jnx {
         return cat;
     }
 
+    const std::string& appLatestTag()
+    {
+        static std::string tag;
+        static bool loaded = false;
+        if (!loaded) {
+            loaded = true;
+            tag = util::getLatestTag(TAGS_INFO);
+        }
+        return tag;
+    }
+
+    const std::string& cheatsVersion()
+    {
+        static std::string version;
+        static bool loaded = false;
+        if (!loaded) {
+            loaded = true;
+            version = util::getCheatsVersion();
+        }
+        return version;
+    }
+
+    void prefetch(const std::function<void(int, int, const char*)>& progress)
+    {
+        progress(0, 3, "Conectando ao GitHub do JNX...");
+        catalog();
+        progress(1, 3, "Verificando atualizações do aplicativo...");
+        appLatestTag();
+        progress(2, 3, "Preparando os cheats...");
+        cheatsVersion();
+        progress(3, 3, "Pronto!");
+    }
+
     System readSystem()
     {
         System sys;

@@ -2,6 +2,7 @@
 
 #include <switch.h>
 
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -54,6 +55,11 @@ namespace jnx {
 
     // Baixa o catálogo uma vez e guarda em memória.
     const Catalog& catalog();
+    // Última versão do aplicativo no GitHub e versão do banco de cheats (buscadas uma vez e guardadas).
+    const std::string& appLatestTag();
+    const std::string& cheatsVersion();
+    // Faz todas as buscas de rede do início. progress(passo, total, texto) é chamado a cada etapa.
+    void prefetch(const std::function<void(int, int, const char*)>& progress);
     // Lê o estado do console (modelo, firmware, Atmosphère, pacote instalado, SD).
     System readSystem();
     // < 0 se a < b, 0 se iguais, > 0 se a > b. Compara "23.0.0-1" por números.

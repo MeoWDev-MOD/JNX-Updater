@@ -5,6 +5,7 @@
 
 #include "download.hpp"
 #include "fs.hpp"
+#include "jnx_loading.hpp"
 #include "jnx_tabs.hpp"
 #include <borealis/glass.hpp>
 #include "list_download_tab.hpp"
@@ -26,7 +27,7 @@ MainFrame::MainFrame() : TabFrame()
     this->setTitle(AppTitle);
 
     s64 freeStorage;
-    std::string tag = util::getLatestTag(TAGS_INFO);
+    std::string tag = jnx::appLatestTag();
     this->setFooterText(fmt::format("menus/main/footer_text"_i18n,
                                     (!tag.empty() && tag != AppVersion) ? AppVersion + "menus/main/new_update"_i18n : AppVersion,
                                     R_SUCCEEDED(fs::getFreeStorageSD(freeStorage)) ? (float)freeStorage / 0x40000000 : -1));
@@ -60,19 +61,7 @@ MainFrame::MainFrame() : TabFrame()
 
 void MainFrame::draw(NVGcontext* vg, int x, int y, unsigned width, unsigned height, brls::Style* style, brls::FrameContext* ctx)
 {
-    // Fundo: céu estrelado do JNX (já suavizado), por trás de todo o vidro
-    static int wallpaper = 0;
-    if (!wallpaper) {
-        wallpaper = nvgCreateImage(vg, "romfs:/jnx_wallpaper.jpg", 0);
-        if (!wallpaper)
-            wallpaper = -1;
-    }
-    if (wallpaper > 0) {
-        NVGpaint paint = nvgImagePattern(vg, x, y, width, height, 0, wallpaper, this->getAlpha());
-        nvgBeginPath(vg);
-        nvgRect(vg, x, y, width, height);
-        nvgFillPaint(vg, paint);
-        nvgFill(vg);
-    }
+    // Fundo: céu estrelado do JNX, por trás de todo o vidro
+    jnx::drawWallpaper(vg, x, y, width, height, this->getAlpha());
     TabFrame::draw(vg, x, y, width, height, style, ctx);
 }

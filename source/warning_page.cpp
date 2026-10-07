@@ -5,6 +5,7 @@
 
 #include "constants.hpp"
 #include "fs.hpp"
+#include "jnx_loading.hpp"
 #include "main_frame.hpp"
 #include "utils.hpp"
 
@@ -17,7 +18,7 @@ WarningPage::WarningPage(const std::string& text)
     this->button = (new brls::Button(brls::ButtonStyle::PRIMARY))->setLabel("menus/common/continue"_i18n);
     this->button->setParent(this);
     this->button->getClickEvent()->subscribe([this](View* view) {
-        brls::Application::pushView(new MainFrame());
+        brls::Application::pushView(new LoadingPage());
     });
 
     this->label = new brls::Label(brls::LabelStyle::REGULAR, text, true);
@@ -30,6 +31,7 @@ WarningPage::WarningPage(const std::string& text)
 
 void WarningPage::draw(NVGcontext* vg, int x, int y, unsigned width, unsigned height, brls::Style* style, brls::FrameContext* ctx)
 {
+    jnx::drawWallpaper(vg, x, y, width, height, 1.0f);
     auto end = std::chrono::high_resolution_clock::now();
     auto missing = std::max(1l - std::chrono::duration_cast<std::chrono::seconds>(end - start).count(), 0l);
     auto text = std::string("menus/common/continue"_i18n);

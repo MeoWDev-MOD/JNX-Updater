@@ -11,6 +11,7 @@
 #include "download.hpp"
 #include "extract.hpp"
 #include "fs.hpp"
+#include "jnx.hpp"
 #include "utils.hpp"
 #include "worker_page.hpp"
 
@@ -140,7 +141,7 @@ void ListDownloadTab::setDescription(contentType type)
                 "menus/main/bootloaders_text"_i18n);
             break;
         case contentType::cheats:
-            this->newCheatsVer = util::getCheatsVersion();
+            this->newCheatsVer = jnx::cheatsVersion();
             this->currentCheatsVer = util::readFile(CHEATS_VERSION);
             description->setText("menus/main/cheats_text"_i18n + this->currentCheatsVer);
             break;

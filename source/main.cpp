@@ -8,6 +8,7 @@
 #include "current_cfw.hpp"
 #include "fs.hpp"
 #include "jnx_theme.hpp"
+#include "jnx_loading.hpp"
 #include "main_frame.hpp"
 #include "warning_page.hpp"
 
@@ -57,7 +58,7 @@ int main(int argc, char* argv[])
     brls::Logger::debug("Start");
 
     if (std::filesystem::exists(HIDDEN_AIO_FILE)) {
-        brls::Application::pushView(new MainFrame());
+        brls::Application::pushView(new LoadingPage());
     }
     else {
         brls::Application::pushView(new WarningPage("menus/main/launch_warning"_i18n));
