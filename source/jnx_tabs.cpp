@@ -286,7 +286,7 @@ namespace {
 
         void modelCard(NVGcontext* vg, brls::FrameContext* ctx, float x, float y, float w, float h)
         {
-            brls::glass::panel(vg, x, y, w, h, 16, this->getAlpha());
+            brls::glass::panel(vg, x, y, w, h, 28, this->getAlpha());
             brls::glass::tile(vg, x + 14, y + 14, 34, brls::glass::CHIP, nvgRGB(96, 165, 250), nvgRGB(37, 99, 235), this->getAlpha());
             text(vg, ctx, x + 58, y + 31, 15, ctx->theme->descriptionColor, "MODELO", w - 70, 11);
 
@@ -311,7 +311,7 @@ namespace {
         void card(NVGcontext* vg, brls::FrameContext* ctx, float x, float y, float w, float h, int glyph, NVGcolor top, NVGcolor bottom,
                   const std::string& label, const std::string& value, const std::string& sub, float bar = -1.0f)
         {
-            brls::glass::panel(vg, x, y, w, h, 16, this->getAlpha());
+            brls::glass::panel(vg, x, y, w, h, 28, this->getAlpha());
             brls::glass::tile(vg, x + 14, y + 14, 34, glyph, top, bottom, this->getAlpha());
 
             const float inner = w - 28;
@@ -359,7 +359,7 @@ namespace {
             const float heroH = 108;
 
             // --- faixa principal: painel de vidro com o logo ---
-            brls::glass::panel(vg, x, y, W, heroH, 20, this->getAlpha());
+            brls::glass::panel(vg, x, y, W, heroH, 34, this->getAlpha());
             const float t = 76;
             brls::glass::tile(vg, x + 16, y + (heroH - t) / 2, t, brls::glass::NONE, nvgRGB(167, 139, 250), nvgRGB(109, 40, 217), this->getAlpha());
             if (this->logo > 0) {

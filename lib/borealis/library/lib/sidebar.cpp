@@ -108,19 +108,9 @@ void SidebarItem::draw(NVGcontext* vg, int x, int y, unsigned width, unsigned he
 {
     if (this->glyph >= 0)
     {
-        // Item ativo: pílula de vidro atrás do ícone e do texto
+        // Item ativo: cápsula de Liquid Glass atrás do ícone e do texto
         if (this->active)
-        {
-            nvgBeginPath(vg);
-            nvgRoundedRect(vg, x + 2, y + 2, width - 4, height - 4, 14);
-            nvgFillColor(vg, a(nvgRGBA(255, 255, 255, 30)));
-            nvgFill(vg);
-            nvgBeginPath(vg);
-            nvgRoundedRect(vg, x + 2.5f, y + 2.5f, width - 5, height - 5, 14);
-            nvgStrokeWidth(vg, 1.0f);
-            nvgStrokeColor(vg, a(nvgRGBA(255, 255, 255, 52)));
-            nvgStroke(vg);
-        }
+            glass::capsule(vg, x + 2, y + 2, width - 4, height - 4, this->getAlpha());
 
         const float s  = (float)height - 14.0f;
         const float tx = x + 10.0f;

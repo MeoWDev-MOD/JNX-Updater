@@ -62,7 +62,7 @@ void LoadingPage::draw(NVGcontext* vg, int x, int y, unsigned width, unsigned he
 
     if (!this->logo) {
         this->vgForLogo = vg;
-        this->logo = nvgCreateImage(vg, "romfs:/jnx_logo_white.png", 0);
+        this->logo = nvgCreateImage(vg, "romfs:/jnx_logo_glass.png", 0);
         if (!this->logo)
             this->logo = -1;
     }
@@ -70,78 +70,97 @@ void LoadingPage::draw(NVGcontext* vg, int x, int y, unsigned width, unsigned he
     jnx::drawWallpaper(vg, x, y, width, height, 1.0f);
 
     const float cx = x + width / 2.0f;
-    const float cy = y + height / 2.0f - 40.0f;
+    const float oy = y + 205.0f;  // centro do disco de vidro
+    const float breathe = 1.0f + 0.018f * std::sin(t * 2.0f);
+    const float R = 120.0f * breathe;
 
-    // Logo de vidro "respirando"
-    const float breathe = 1.0f + 0.025f * std::sin(t * 2.2f);
-    const float s = 132.0f * breathe;
-    const float tx = cx - s / 2, ty = cy - s / 2;
-
-    NVGpaint halo = nvgRadialGradient(vg, cx, cy, s * 0.4f, s * 1.5f, nvgRGBA(139, 92, 246, 90), nvgRGBA(139, 92, 246, 0));
+    // luz ambiente atrás do disco
+    NVGpaint ambient = nvgRadialGradient(vg, cx, oy, R * 0.6f, R * 2.6f, nvgRGBA(139, 92, 246, 120), nvgRGBA(139, 92, 246, 0));
     nvgBeginPath(vg);
-    nvgCircle(vg, cx, cy, s * 1.5f);
-    nvgFillPaint(vg, halo);
+    nvgCircle(vg, cx, oy, R * 2.6f);
+    nvgFillPaint(vg, ambient);
     nvgFill(vg);
 
-    brls::glass::tile(vg, tx, ty, s, brls::glass::NONE, nvgRGB(167, 139, 250), nvgRGB(109, 40, 217), 1.0f);
+    // disco de Liquid Glass com o gato dentro
+    brls::glass::panel(vg, cx - R, oy - R, R * 2, R * 2, R, 1.0f);
     if (this->logo > 0) {
-        const float pad = s * 0.20f;
-        NVGpaint img = nvgImagePattern(vg, tx + pad, ty + pad, s - pad * 2, s - pad * 2, 0, this->logo, 1.0f);
+        const float L = R * 1.42f;
+        NVGpaint halo = nvgRadialGradient(vg, cx, oy, 0, L * 0.7f, nvgRGBA(196, 181, 253, 70), nvgRGBA(196, 181, 253, 0));
         nvgBeginPath(vg);
-        nvgRect(vg, tx + pad, ty + pad, s - pad * 2, s - pad * 2);
+        nvgCircle(vg, cx, oy, L * 0.7f);
+        nvgFillPaint(vg, halo);
+        nvgFill(vg);
+        NVGpaint img = nvgImagePattern(vg, cx - L / 2, oy - L / 2, L, L, 0, this->logo, 1.0f);
+        nvgBeginPath(vg);
+        nvgRect(vg, cx - L / 2, oy - L / 2, L, L);
         nvgFillPaint(vg, img);
         nvgFill(vg);
     }
 
-    // Título
+    // Título com brilho violeta
     nvgFontFaceId(vg, ctx->fontStash->regular);
     nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-    nvgFontSize(vg, 44);
+    nvgFontSize(vg, 76);
+    nvgFontBlur(vg, 16);
+    nvgFillColor(vg, nvgRGBA(139, 92, 246, 210));
+    nvgBeginPath(vg);
+    nvgText(vg, cx, y + 392, "JNX MOD", nullptr);
+    nvgFontBlur(vg, 0);
     nvgFillColor(vg, nvgRGB(255, 255, 255));
     nvgBeginPath(vg);
-    nvgText(vg, cx, cy + s / 2 + 52, "JNX MOD", nullptr);
+    nvgText(vg, cx, y + 392, "JNX MOD", nullptr);
 
-    // Barra de progresso (anima suave até o passo atual)
-    const float target = this->done ? 1.0f : (float)this->step / (float)this->total;
-    this->shown += (target - this->shown) * 0.08f;
-    const float bw = 340, bh = 8, bx = cx - bw / 2, by = cy + s / 2 + 96;
-
+    nvgFontSize(vg, 24);
+    nvgFillColor(vg, nvgRGB(jnx::LILAC_R, jnx::LILAC_G, jnx::LILAC_B));
     nvgBeginPath(vg);
-    nvgRoundedRect(vg, bx, by, bw, bh, bh / 2);
-    nvgFillColor(vg, nvgRGBA(255, 255, 255, 34));
-    nvgFill(vg);
+    nvgText(vg, cx, y + 448, "Design by MeoW", nullptr);
 
-    const float fw = std::max(bh, bw * (0.06f + 0.94f * this->shown));
-    nvgBeginPath(vg);
-    nvgRoundedRect(vg, bx, by, fw, bh, bh / 2);
-    nvgFillPaint(vg, nvgLinearGradient(vg, bx, 0, bx + bw, 0, nvgRGB(jnx::LILAC_R, jnx::LILAC_G, jnx::LILAC_B), nvgRGB(jnx::VIOLET_R, jnx::VIOLET_G, jnx::VIOLET_B)));
-    nvgFill(vg);
+    // Cápsula de vidro com a etapa e a barra de progresso
+    const float cw = 560, ch = 96, bx0 = cx - cw / 2, by0 = y + 506;
+    brls::glass::panel(vg, bx0, by0, cw, ch, ch / 2, 1.0f);
 
-    // brilho que passa pela barra
-    const float sweep = std::fmod(t * 0.9f, 1.6f) - 0.3f;
-    nvgSave(vg);
-    nvgIntersectScissor(vg, bx, by, fw, bh);
-    nvgBeginPath(vg);
-    nvgRect(vg, bx + sweep * bw - 40, by, 80, bh);
-    nvgFillPaint(vg, nvgLinearGradient(vg, bx + sweep * bw - 40, 0, bx + sweep * bw + 40, 0, nvgRGBA(255, 255, 255, 0), nvgRGBA(255, 255, 255, 110)));
-    nvgFill(vg);
-    nvgRestore(vg);
-
-    // Texto da etapa com pontinhos animados
     std::string text;
     {
         std::lock_guard<std::mutex> lock(this->labelMutex);
         text = this->label;
     }
-    nvgFontSize(vg, 20);
-    nvgFillColor(vg, ctx->theme->descriptionColor);
+    nvgFontSize(vg, 21);
+    nvgFillColor(vg, nvgRGB(244, 241, 255));
     nvgBeginPath(vg);
-    nvgText(vg, cx, by + 36, text.c_str(), nullptr);
+    nvgText(vg, cx, by0 + 32, text.c_str(), nullptr);
 
-    nvgFontSize(vg, 16);
-    nvgFillColor(vg, nvgRGBA(255, 255, 255, 90));
+    const float target = this->done ? 1.0f : (float)this->step / (float)this->total;
+    this->shown += (target - this->shown) * 0.08f;
+    const float bw = cw - 80, bh = 12, bx = cx - bw / 2, by = by0 + 58;
+
     nvgBeginPath(vg);
-    nvgText(vg, cx, y + height - 34, "Design by MeoW", nullptr);
+    nvgRoundedRect(vg, bx, by, bw, bh, bh / 2);
+    nvgFillColor(vg, nvgRGBA(255, 255, 255, 36));
+    nvgFill(vg);
+
+    const float fw = std::max(bh, bw * (0.05f + 0.95f * this->shown));
+
+    // brilho violeta embaixo do preenchimento
+    NVGpaint glow = nvgBoxGradient(vg, bx, by + 2, fw, bh, bh / 2, 14, nvgRGBA(139, 92, 246, 170), nvgRGBA(139, 92, 246, 0));
+    nvgBeginPath(vg);
+    nvgRect(vg, bx - 20, by - 18, fw + 40, bh + 44);
+    nvgFillPaint(vg, glow);
+    nvgFill(vg);
+
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, bx, by, fw, bh, bh / 2);
+    nvgFillPaint(vg, nvgLinearGradient(vg, bx, 0, bx + bw, 0, nvgRGB(jnx::LILAC_R, jnx::LILAC_G, jnx::LILAC_B), nvgRGB(jnx::VIOLET_R, jnx::VIOLET_G, jnx::VIOLET_B)));
+    nvgFill(vg);
+
+    // reflexo que passa pela barra
+    const float sweep = std::fmod(t * 0.9f, 1.6f) - 0.3f;
+    nvgSave(vg);
+    nvgIntersectScissor(vg, bx, by, fw, bh);
+    nvgBeginPath(vg);
+    nvgRect(vg, bx + sweep * bw - 40, by, 80, bh);
+    nvgFillPaint(vg, nvgLinearGradient(vg, bx + sweep * bw - 40, 0, bx + sweep * bw + 40, 0, nvgRGBA(255, 255, 255, 0), nvgRGBA(255, 255, 255, 120)));
+    nvgFill(vg);
+    nvgRestore(vg);
 
     // Abre o app quando terminou (e a tela ficou ao menos um instante visível)
     if (this->done && !this->opened && t > 0.9f && this->shown > 0.97f) {

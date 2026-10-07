@@ -22,6 +22,7 @@
 #include <algorithm>
 #include <borealis/animations.hpp>
 #include <borealis/application.hpp>
+#include <borealis/glass.hpp>
 #include <borealis/view.hpp>
 
 namespace brls
@@ -347,28 +348,8 @@ void View::drawBackground(NVGcontext* vg, FrameContext* ctx, Style* style)
     {
         case ViewBackground::SIDEBAR:
         {
-            unsigned backdropHeight = style->Background.sidebarBorderHeight;
-
-            // Solid color
-            nvgBeginPath(vg);
-            nvgFillColor(vg, a(ctx->theme->sidebarColor));
-            nvgRect(vg, this->x, this->y + backdropHeight, this->width, this->height - backdropHeight * 2);
-            nvgFill(vg);
-
-            //Borders gradient
-            // Top
-            NVGpaint topGradient = nvgLinearGradient(vg, this->x, this->y + backdropHeight, this->x, this->y, a(ctx->theme->sidebarColor), transparent);
-            nvgBeginPath(vg);
-            nvgFillPaint(vg, topGradient);
-            nvgRect(vg, this->x, this->y, this->width, backdropHeight);
-            nvgFill(vg);
-
-            // Bottom
-            NVGpaint bottomGradient = nvgLinearGradient(vg, this->x, this->y + this->height - backdropHeight, this->x, this->y + this->height, a(ctx->theme->sidebarColor), transparent);
-            nvgBeginPath(vg);
-            nvgFillPaint(vg, bottomGradient);
-            nvgRect(vg, this->x, this->y + this->height - backdropHeight, this->width, backdropHeight);
-            nvgFill(vg);
+            // Painel de Liquid Glass flutuando, com margem ao redor
+            glass::panel(vg, this->x + 16, this->y + 6, this->width - 28, this->height - 12, 30, this->getAlpha());
             break;
         }
         case ViewBackground::DEBUG:

@@ -223,81 +223,104 @@ inline void glyph(NVGcontext* vg, int g, float cx, float cy, float u, NVGcolor i
     nvgRestore(vg);
 }
 
-// Ícone de vidro polido: quadrado arredondado em degradê, brilho no topo, borda de luz e sombra suave.
+// ---------------------------------------------------------------------------------
+// Liquid Glass: material translúcido com luz nas bordas, no estilo do sistema mais recente da Apple.
+// ---------------------------------------------------------------------------------
+
+// Luz de borda ("specular"): forte no canto superior esquerdo, suave no inferior direito.
+inline void rim(NVGcontext* vg, float x, float y, float w, float h, float r, float alpha, float width = 1.4f)
+{
+    NVGpaint tl = nvgLinearGradient(vg, x, y, x + w * 0.55f, y + h * 0.55f, nvgRGBA(255, 255, 255, (int)(200 * alpha)), nvgRGBA(255, 255, 255, 0));
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, x + 0.7f, y + 0.7f, w - 1.4f, h - 1.4f, r);
+    nvgStrokeWidth(vg, width);
+    nvgStrokePaint(vg, tl);
+    nvgStroke(vg);
+
+    NVGpaint br = nvgLinearGradient(vg, x + w, y + h, x + w * 0.45f, y + h * 0.45f, nvgRGBA(255, 255, 255, (int)(100 * alpha)), nvgRGBA(255, 255, 255, 0));
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, x + 0.7f, y + 0.7f, w - 1.4f, h - 1.4f, r);
+    nvgStrokeWidth(vg, width);
+    nvgStrokePaint(vg, br);
+    nvgStroke(vg);
+}
+
+// Brilho suave que sobe pelas bordas por dentro (dá a sensação de vidro espesso).
+inline void innerGlow(NVGcontext* vg, float x, float y, float w, float h, float r, float alpha, float strength)
+{
+    NVGpaint g = nvgBoxGradient(vg, x + 3, y + 3, w - 6, h - 6, r * 0.8f, std::min(w, h) * 0.38f, nvgRGBA(255, 255, 255, 0), nvgRGBA(255, 255, 255, (int)(strength * alpha)));
+    nvgBeginPath(vg);
+    nvgRoundedRect(vg, x, y, w, h, r);
+    nvgFillPaint(vg, g);
+    nvgFill(vg);
+}
+
+// Ícone de vidro: cor viva em degradê, luz vinda do canto superior esquerdo, borda iluminada.
 inline void tile(NVGcontext* vg, float x, float y, float s, int g, NVGcolor top, NVGcolor bottom, float alpha = 1.0f)
 {
-    const float r = s * 0.27f;
+    const float r = s * 0.30f;
 
     // sombra suave
-    NVGpaint shadow = nvgBoxGradient(vg, x, y + s * 0.07f, s, s, r, s * 0.30f, nvgRGBA(0, 0, 0, (int)(120 * alpha)), nvgRGBA(0, 0, 0, 0));
+    NVGpaint shadow = nvgBoxGradient(vg, x, y + s * 0.10f, s, s, r, s * 0.38f, nvgRGBA(0, 0, 0, (int)(105 * alpha)), nvgRGBA(0, 0, 0, 0));
     nvgBeginPath(vg);
-    nvgRect(vg, x - s * 0.5f, y - s * 0.4f, s * 2.0f, s * 2.0f);
+    nvgRect(vg, x - s * 0.6f, y - s * 0.4f, s * 2.2f, s * 2.2f);
     nvgFillPaint(vg, shadow);
     nvgFill(vg);
 
     // corpo
-    NVGpaint body = nvgLinearGradient(vg, x, y, x, y + s, scaleAlpha(top, alpha), scaleAlpha(bottom, alpha));
+    NVGpaint body = nvgLinearGradient(vg, x, y, x + s * 0.65f, y + s, scaleAlpha(top, alpha), scaleAlpha(bottom, alpha));
     nvgBeginPath(vg);
     nvgRoundedRect(vg, x, y, s, s, r);
     nvgFillPaint(vg, body);
     nvgFill(vg);
 
-    // luz subindo da base
-    NVGpaint glow = nvgRadialGradient(vg, x + s * 0.5f, y + s * 1.05f, s * 0.05f, s * 0.75f, nvgRGBA(255, 255, 255, (int)(80 * alpha)), nvgRGBA(255, 255, 255, 0));
+    // luz difusa do canto superior esquerdo
+    NVGpaint lens = nvgRadialGradient(vg, x + s * 0.25f, y + s * 0.12f, 0, s * 0.95f, nvgRGBA(255, 255, 255, (int)(80 * alpha)), nvgRGBA(255, 255, 255, 0));
     nvgBeginPath(vg);
     nvgRoundedRect(vg, x, y, s, s, r);
-    nvgFillPaint(vg, glow);
+    nvgFillPaint(vg, lens);
     nvgFill(vg);
 
-    // brilho do vidro (metade de cima)
-    NVGpaint gloss = nvgLinearGradient(vg, x, y, x, y + s * 0.55f, nvgRGBA(255, 255, 255, (int)(115 * alpha)), nvgRGBA(255, 255, 255, (int)(10 * alpha)));
-    nvgBeginPath(vg);
-    nvgRoundedRect(vg, x + s * 0.045f, y + s * 0.045f, s * 0.91f, s * 0.50f, r * 0.8f);
-    nvgFillPaint(vg, gloss);
-    nvgFill(vg);
-
-    // borda de luz
-    NVGpaint rim = nvgLinearGradient(vg, x, y, x, y + s, nvgRGBA(255, 255, 255, (int)(160 * alpha)), nvgRGBA(255, 255, 255, (int)(28 * alpha)));
-    nvgBeginPath(vg);
-    nvgRoundedRect(vg, x + 0.6f, y + 0.6f, s - 1.2f, s - 1.2f, r);
-    nvgStrokeWidth(vg, 1.3f);
-    nvgStrokePaint(vg, rim);
-    nvgStroke(vg);
+    innerGlow(vg, x, y, s, s, r, alpha, 70.0f);
+    rim(vg, x, y, s, s, r, alpha, 1.3f);
 
     if (g >= 0)
     {
         const float u = s / 100.0f * 1.02f;
-        glyph(vg, g, x + s * 0.5f, y + s * 0.5f + s * 0.035f, u, nvgRGBA(0, 0, 0, (int)(70 * alpha)), nvgRGBA(0, 0, 0, 0));
-        glyph(vg, g, x + s * 0.5f, y + s * 0.5f, u, nvgRGBA(255, 255, 255, (int)(245 * alpha)), scaleAlpha(bottom, alpha));
+        glyph(vg, g, x + s * 0.5f, y + s * 0.5f + s * 0.025f, u, nvgRGBA(0, 0, 0, (int)(46 * alpha)), nvgRGBA(0, 0, 0, 0));
+        glyph(vg, g, x + s * 0.5f, y + s * 0.5f, u, nvgRGBA(255, 255, 255, (int)(246 * alpha)), scaleAlpha(bottom, alpha));
     }
 }
 
-// Painel de vidro fosco: preenchimento translúcido, brilho no topo e borda de luz.
+// Painel de Liquid Glass: quase transparente, luz nas bordas e brilho difuso no canto.
 inline void panel(NVGcontext* vg, float x, float y, float w, float h, float r, float alpha = 1.0f)
 {
-    NVGpaint shadow = nvgBoxGradient(vg, x, y + 4, w, h, r, 16, nvgRGBA(0, 0, 0, (int)(70 * alpha)), nvgRGBA(0, 0, 0, 0));
+    NVGpaint shadow = nvgBoxGradient(vg, x, y + 8, w, h, r, 30, nvgRGBA(0, 0, 0, (int)(78 * alpha)), nvgRGBA(0, 0, 0, 0));
     nvgBeginPath(vg);
-    nvgRect(vg, x - 24, y - 20, w + 48, h + 56);
+    nvgRect(vg, x - 40, y - 30, w + 80, h + 90);
     nvgFillPaint(vg, shadow);
     nvgFill(vg);
 
+    NVGpaint fill = nvgLinearGradient(vg, x, y, x, y + h, nvgRGBA(255, 255, 255, (int)(34 * alpha)), nvgRGBA(255, 255, 255, (int)(14 * alpha)));
     nvgBeginPath(vg);
     nvgRoundedRect(vg, x, y, w, h, r);
-    nvgFillColor(vg, nvgRGBA(255, 255, 255, (int)(20 * alpha)));
+    nvgFillPaint(vg, fill);
     nvgFill(vg);
 
-    NVGpaint sheen = nvgLinearGradient(vg, x, y, x, y + h * 0.6f, nvgRGBA(255, 255, 255, (int)(34 * alpha)), nvgRGBA(255, 255, 255, 0));
+    NVGpaint lens = nvgRadialGradient(vg, x + w * 0.14f, y, 0, std::max(w, h) * 0.6f, nvgRGBA(222, 205, 255, (int)(52 * alpha)), nvgRGBA(222, 205, 255, 0));
     nvgBeginPath(vg);
     nvgRoundedRect(vg, x, y, w, h, r);
-    nvgFillPaint(vg, sheen);
+    nvgFillPaint(vg, lens);
     nvgFill(vg);
 
-    NVGpaint rim = nvgLinearGradient(vg, x, y, x, y + h, nvgRGBA(255, 255, 255, (int)(78 * alpha)), nvgRGBA(255, 255, 255, (int)(18 * alpha)));
-    nvgBeginPath(vg);
-    nvgRoundedRect(vg, x + 0.5f, y + 0.5f, w - 1, h - 1, r);
-    nvgStrokeWidth(vg, 1.2f);
-    nvgStrokePaint(vg, rim);
-    nvgStroke(vg);
+    innerGlow(vg, x, y, w, h, r, alpha, 38.0f);
+    rim(vg, x, y, w, h, r, alpha, 1.4f);
+}
+
+// Cápsula de vidro (raio = metade da altura).
+inline void capsule(NVGcontext* vg, float x, float y, float w, float h, float alpha = 1.0f)
+{
+    panel(vg, x, y, w, h, h * 0.5f, alpha);
 }
 
 } // namespace glass

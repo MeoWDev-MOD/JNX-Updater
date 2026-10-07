@@ -26,7 +26,7 @@ namespace jnx {
             this->notificationTextColor = nvgRGB(255, 255, 255);
             this->backdropColor         = nvgRGBA(6, 4, 14, 190);
 
-            this->separatorColor = nvgRGBA(255, 255, 255, 46);
+            this->separatorColor = nvgRGBA(255, 255, 255, 0);
 
             this->sidebarColor          = nvgRGBA(255, 255, 255, 13);
             this->activeTabColor        = nvgRGB(VIOLET_R, VIOLET_G, VIOLET_B);
@@ -90,7 +90,7 @@ namespace jnx {
             this->Sidebar.Separator.height = 16;
 
             this->Highlight.strokeWidth  = 3;
-            this->Highlight.cornerRadius = 14.0f;
+            this->Highlight.cornerRadius = 24.0f;
 
             this->List.marginLeftRight = 34;
             this->List.marginTopBottom = 24;
