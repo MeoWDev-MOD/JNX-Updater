@@ -43,9 +43,17 @@ namespace jnx {
         std::vector<Item> toolbox;
     };
 
+    enum class Model
+    {
+        Standard,  // Switch V1 / V2 (Joy-Cons removiveis)
+        Lite,
+        Oled,
+    };
+
     struct System
     {
         std::string model;
+        Model modelKind = Model::Standard;
         std::string firmware;
         std::string atmosphere;
         std::string installedPack;  // vazio = JNX não instalado

@@ -204,6 +204,110 @@ namespace {
             text(vg, ctx, x + 33, cy, 19, c, s);
         }
 
+        // Pixel art do console (grade de 32x14 "pixels" de tamanho p).
+        void pixels(NVGcontext* vg, float x, float y, int p, int col, int row, int w, int h, NVGcolor c)
+        {
+            nvgBeginPath(vg);
+            nvgRect(vg, x + col * p, y + row * p, w * p, h * p);
+            nvgFillColor(vg, a(c));
+            nvgFill(vg);
+        }
+
+        void screen(NVGcontext* vg, float x, float y, int p, int col, int row, int w, int h, NVGcolor top, NVGcolor bottom)
+        {
+            for (int i = 0; i < h; i++) {
+                float k = h > 1 ? (float)i / (h - 1) : 0.0f;
+                NVGcolor c = nvgRGB((int)((top.r + (bottom.r - top.r) * k) * 255), (int)((top.g + (bottom.g - top.g) * k) * 255), (int)((top.b + (bottom.b - top.b) * k) * 255));
+                pixels(vg, x, y, p, col, row + i, w, 1, c);
+            }
+            // reflexo diagonal da tela
+            for (int i = 0; i < 4 && i < h - 1; i++)
+                pixels(vg, x, y, p, col + 1 + i * 2, row + 1 + i, 3, 1, nvgRGBA(255, 255, 255, 70));
+        }
+
+        void console(NVGcontext* vg, float x, float y, int p, jnx::Model kind)
+        {
+            const NVGcolor dark = nvgRGB(24, 22, 40), body = nvgRGB(38, 36, 58);
+            if (kind == jnx::Model::Lite) {
+                const NVGcolor t = nvgRGB(45, 212, 191), t2 = nvgRGB(13, 148, 136), tl = nvgRGB(153, 246, 228);
+                pixels(vg, x, y, p, 1, 0, 30, 1, t);
+                pixels(vg, x, y, p, 0, 1, 32, 12, t);
+                pixels(vg, x, y, p, 1, 13, 30, 1, t2);
+                pixels(vg, x, y, p, 0, 12, 32, 1, t2);
+                pixels(vg, x, y, p, 1, 1, 30, 1, tl);
+                pixels(vg, x, y, p, 7, 1, 18, 12, dark);
+                screen(vg, x, y, p, 8, 2, 16, 10, nvgRGB(150, 112, 255), nvgRGB(66, 36, 180));
+                pixels(vg, x, y, p, 2, 3, 3, 3, dark);   // analógico esquerdo
+                pixels(vg, x, y, p, 3, 8, 1, 3, dark);   // direcional
+                pixels(vg, x, y, p, 2, 9, 3, 1, dark);
+                pixels(vg, x, y, p, 27, 3, 1, 1, dark);  // botões A B X Y
+                pixels(vg, x, y, p, 26, 4, 1, 1, dark);
+                pixels(vg, x, y, p, 28, 4, 1, 1, dark);
+                pixels(vg, x, y, p, 27, 5, 1, 1, dark);
+                pixels(vg, x, y, p, 26, 8, 3, 3, dark);  // analógico direito
+                return;
+            }
+
+            const bool oled = (kind == jnx::Model::Oled);
+            const NVGcolor L = oled ? nvgRGB(236, 236, 242) : nvgRGB(56, 189, 248);
+            const NVGcolor Ld = oled ? nvgRGB(190, 190, 204) : nvgRGB(14, 116, 190);
+            const NVGcolor R = oled ? nvgRGB(236, 236, 242) : nvgRGB(248, 83, 83);
+            const NVGcolor Rd = oled ? nvgRGB(190, 190, 204) : nvgRGB(185, 28, 28);
+            const NVGcolor btn = oled ? nvgRGB(90, 90, 110) : nvgRGB(20, 40, 70);
+            const NVGcolor btnR = oled ? nvgRGB(90, 90, 110) : nvgRGB(80, 14, 14);
+
+            // Joy-Con esquerdo
+            pixels(vg, x, y, p, 1, 0, 4, 1, L);
+            pixels(vg, x, y, p, 0, 1, 6, 12, L);
+            pixels(vg, x, y, p, 1, 13, 4, 1, Ld);
+            pixels(vg, x, y, p, 0, 12, 6, 1, Ld);
+            pixels(vg, x, y, p, 5, 1, 1, 11, Ld);
+            pixels(vg, x, y, p, 2, 3, 2, 2, btn);
+            pixels(vg, x, y, p, 3, 8, 1, 3, btn);
+            pixels(vg, x, y, p, 2, 9, 3, 1, btn);
+            // Joy-Con direito
+            pixels(vg, x, y, p, 27, 0, 4, 1, R);
+            pixels(vg, x, y, p, 26, 1, 6, 12, R);
+            pixels(vg, x, y, p, 27, 13, 4, 1, Rd);
+            pixels(vg, x, y, p, 26, 12, 6, 1, Rd);
+            pixels(vg, x, y, p, 26, 1, 1, 11, Rd);
+            pixels(vg, x, y, p, 29, 3, 1, 1, btnR);
+            pixels(vg, x, y, p, 28, 4, 1, 1, btnR);
+            pixels(vg, x, y, p, 30, 4, 1, 1, btnR);
+            pixels(vg, x, y, p, 29, 5, 1, 1, btnR);
+            pixels(vg, x, y, p, 28, 8, 2, 2, btnR);
+            // corpo e tela
+            pixels(vg, x, y, p, 6, 0, 20, 14, oled ? dark : body);
+            if (oled)
+                screen(vg, x, y, p, 7, 1, 18, 12, nvgRGB(150, 112, 255), nvgRGB(66, 36, 180));
+            else
+                screen(vg, x, y, p, 8, 2, 16, 10, nvgRGB(130, 98, 240), nvgRGB(60, 34, 160));
+        }
+
+        void modelCard(NVGcontext* vg, brls::FrameContext* ctx, float x, float y, float w, float h)
+        {
+            brls::glass::panel(vg, x, y, w, h, 16, this->getAlpha());
+            brls::glass::tile(vg, x + 14, y + 14, 34, brls::glass::CHIP, nvgRGB(96, 165, 250), nvgRGB(37, 99, 235), this->getAlpha());
+            text(vg, ctx, x + 58, y + 31, 15, ctx->theme->descriptionColor, "MODELO", w - 70, 11);
+
+            const int p = std::max(2, std::min(4, (int)((w - 24) / 32)));
+            const float ax = x + std::floor((w - 32 * p) / 2.0f), ay = y + 56;
+            // sombra no chão
+            nvgBeginPath(vg);
+            nvgEllipse(vg, x + w / 2, ay + 14 * p + 3, 16 * p, 3);
+            nvgFillColor(vg, a(nvgRGBA(0, 0, 0, 70)));
+            nvgFill(vg);
+            console(vg, ax, ay, p, sys.modelKind);
+
+            nvgFontFaceId(vg, ctx->fontStash->regular);
+            nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+            float size = fit(vg, ctx, 19, 12, w - 20, sys.model);
+            nvgFontSize(vg, size);
+            nvgFillColor(vg, a(ctx->theme->textColor));
+            nvgBeginPath(vg);
+            nvgText(vg, x + w / 2, y + h - 18, sys.model.c_str(), nullptr);
+        }
+
         void card(NVGcontext* vg, brls::FrameContext* ctx, float x, float y, float w, float h, int glyph, NVGcolor top, NVGcolor bottom,
                   const std::string& label, const std::string& value, const std::string& sub, float bar = -1.0f)
         {
@@ -267,7 +371,12 @@ namespace {
                 nvgFill(vg);
             }
             text(vg, ctx, x + 108, y + 38, 38, nvgRGB(255, 255, 255), "JNX");
-            text(vg, ctx, x + 108, y + 76, 18, ctx->theme->descriptionColor, "Pacote de homebrews para Switch", W - 108 - 230, 12);
+            std::string subtitle = sys.installedPack.empty() ? "Pacote JNX não instalado" : "Pacote JNX " + sys.installedPack;
+            if (!cat.online)
+                subtitle += "  ·  sem conexão";
+            else if (jnx::hasPackUpdate(sys, cat) && !sys.installedPack.empty())
+                subtitle += "  ·  nova: " + cat.pack.version;
+            text(vg, ctx, x + 108, y + 76, 18, ctx->theme->descriptionColor, subtitle, W - 108 - 200, 12);
 
             // estado geral
             Tone tone;
@@ -290,9 +399,7 @@ namespace {
             const float gap = 12, cy = y + heroH + 16, ch = 138;
             const float cw = (W - gap * 3) / 4.0f;
 
-            std::string packValue = sys.installedPack.empty() ? "—" : sys.installedPack;
-            std::string packSub = !cat.online ? "sem conexão" : (jnx::hasPackUpdate(sys, cat) ? "nova: " + cat.pack.version : "versão mais recente");
-            card(vg, ctx, x, cy, cw, ch, brls::glass::PACKAGE, nvgRGB(244, 114, 182), nvgRGB(190, 24, 93), "PACOTE", packValue, packSub);
+            modelCard(vg, ctx, x, cy, cw, ch);
 
             card(vg, ctx, x + (cw + gap), cy, cw, ch, brls::glass::CHIP, nvgRGB(96, 165, 250), nvgRGB(37, 99, 235), "FIRMWARE", sys.firmware, sys.model);
 

@@ -71,20 +71,28 @@ namespace jnx {
             return a == std::string::npos ? "" : s.substr(a, b - a + 1);
         }
 
-        std::string modelName()
+        void detectModel(System& sys)
         {
             SetSysProductModel model;
+            sys.modelKind = Model::Standard;
+            sys.model = "Switch";
             if (R_FAILED(setsysGetProductModel(&model)))
-                return "Switch";
+                return;
             switch (model) {
+                case SetSysProductModel_Nx:
+                    sys.model = "Switch V1";
+                    break;
                 case SetSysProductModel_Hoag:
-                    return "Switch Lite";
+                    sys.model = "Switch Lite";
+                    sys.modelKind = Model::Lite;
+                    break;
                 case SetSysProductModel_Aula:
-                    return "Switch OLED";
-                case SetSysProductModel_Iowa:
-                    return "Switch (v2)";
-                default:
-                    return "Switch";
+                    sys.model = "Switch OLED";
+                    sys.modelKind = Model::Oled;
+                    break;
+                default:  // Iowa e variantes: Switch V2
+                    sys.model = "Switch V2";
+                    break;
             }
         }
 
@@ -160,7 +168,7 @@ namespace jnx {
     System readSystem()
     {
         System sys;
-        sys.model = modelName();
+        detectModel(sys);
 
         SetSysFirmwareVersion fw;
         sys.firmware = R_SUCCEEDED(setsysGetFirmwareVersion(&fw)) ? fw.display_version : "?";
