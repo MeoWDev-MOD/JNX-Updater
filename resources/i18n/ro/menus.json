@@ -133,13 +133,7 @@
     "download_firmware": "Descărcați firmware-uri",
     "download_cheats": "Descărcați trișări",
     "tools": "Unelte",
-    "launch_warning": "Bem-vindo ao JNX MOD!
-
-◆ Este aplicativo atualiza o pacote JNX e baixa firmwares, traduções, mods e ferramentas direto do GitHub do JNX.
-◆ Faça um backup do seu emuMMC e do NAND antes de qualquer atualização grande.
-◆ Para evitar corrupção de dados, não use cartão SD formatado em exFAT.
-
-Esta tela não será exibida novamente.",
+    "launch_warning": "Bem-vindo ao JNX MOD!\n\n◆ Este aplicativo atualiza o pacote JNX e baixa firmwares, traduções, mods e ferramentas direto do GitHub do JNX.\n◆ Faça um backup do seu emuMMC e do NAND antes de qualquer atualização grande.\n◆ Para evitar corrupção de dados, não use cartão SD formatado em exFAT.\n\nEsta tela não será exibida novamente.",
     "footer_text": "v{} | {:.1f}GB disponibil",
     "theme_warning": "Se pare că aveți o temă personalizată instalată, acest lucru poate duce la eșecul sistemului dvs. de pornire după actualizarea firmware-ului.\nVă rugăm să o ștergeți înainte de a actualiza.\n\nDo you wish to proceed regardless?",
     "payloads_label": "\u25c6 Descărcați încărcăturile utile RCM pe {}",

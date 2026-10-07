@@ -11,6 +11,8 @@
 #include "download.hpp"
 #include "extract.hpp"
 #include "fs.hpp"
+#include <borealis/glass.hpp>
+
 #include "jnx_theme.hpp"
 #include "progress_event.hpp"
 #include "utils.hpp"
@@ -150,11 +152,27 @@ namespace {
         int logo = 0;
         NVGcontext* vgForLogo = nullptr;
 
-        void text(NVGcontext* vg, brls::FrameContext* ctx, float x, float y, float size, NVGcolor color, const std::string& s, int align = NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE)
+        // Tamanho de fonte que cabe em maxW (reduz até minSize).
+        float fit(NVGcontext* vg, brls::FrameContext* ctx, float size, float minSize, float maxW, const std::string& s)
         {
             nvgFontFaceId(vg, ctx->fontStash->regular);
+            for (; size > minSize; size -= 1.0f) {
+                nvgFontSize(vg, size);
+                float bounds[4];
+                nvgTextBounds(vg, 0, 0, s.c_str(), nullptr, bounds);
+                if (bounds[2] - bounds[0] <= maxW)
+                    break;
+            }
+            return size;
+        }
+
+        void text(NVGcontext* vg, brls::FrameContext* ctx, float x, float y, float size, NVGcolor color, const std::string& s, float maxW = 0, float minSize = 12)
+        {
+            if (maxW > 0)
+                size = fit(vg, ctx, size, minSize, maxW, s);
+            nvgFontFaceId(vg, ctx->fontStash->regular);
             nvgFontSize(vg, size);
-            nvgTextAlign(vg, align);
+            nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_MIDDLE);
             nvgFillColor(vg, a(color));
             nvgBeginPath(vg);
             nvgText(vg, x, y, s.c_str(), nullptr);
@@ -163,51 +181,51 @@ namespace {
         void chip(NVGcontext* vg, brls::FrameContext* ctx, float right, float cy, Tone tone, const std::string& s)
         {
             nvgFontFaceId(vg, ctx->fontStash->regular);
-            nvgFontSize(vg, 20);
+            nvgFontSize(vg, 19);
             float bounds[4];
             nvgTextBounds(vg, 0, 0, s.c_str(), nullptr, bounds);
-            float w = bounds[2] - bounds[0] + 40, h = 36, x = right - w;
+            float w = bounds[2] - bounds[0] + 44, h = 34, x = right - w;
             NVGcolor c = toneColor(tone);
             NVGcolor bg = c;
-            bg.a = 0.18f;
+            bg.a = 0.20f;
             nvgBeginPath(vg);
             nvgRoundedRect(vg, x, cy - h / 2, w, h, h / 2);
             nvgFillColor(vg, a(bg));
             nvgFill(vg);
             nvgBeginPath(vg);
-            nvgCircle(vg, x + 18, cy, 5);
+            nvgRoundedRect(vg, x + 0.5f, cy - h / 2 + 0.5f, w - 1, h - 1, h / 2);
+            nvgStrokeColor(vg, a(nvgRGBA(255, 255, 255, 46)));
+            nvgStrokeWidth(vg, 1.0f);
+            nvgStroke(vg);
+            nvgBeginPath(vg);
+            nvgCircle(vg, x + 19, cy, 5);
             nvgFillColor(vg, a(c));
             nvgFill(vg);
-            text(vg, ctx, x + 32, cy, 20, c, s);
+            text(vg, ctx, x + 33, cy, 19, c, s);
         }
 
-        void card(NVGcontext* vg, brls::FrameContext* ctx, float x, float y, float w, float h, const std::string& label, const std::string& value, const std::string& sub, Tone tone, float bar = -1.0f)
+        void card(NVGcontext* vg, brls::FrameContext* ctx, float x, float y, float w, float h, int glyph, NVGcolor top, NVGcolor bottom,
+                  const std::string& label, const std::string& value, const std::string& sub, float bar = -1.0f)
         {
-            nvgBeginPath(vg);
-            nvgRoundedRect(vg, x, y, w, h, 10);
-            nvgFillColor(vg, a(nvgRGB(24, 19, 46)));
-            nvgFill(vg);
-            // faixa de cor no topo
-            nvgBeginPath(vg);
-            nvgRoundedRect(vg, x, y, w, 4, 2);
-            nvgFillColor(vg, a(toneColor(tone)));
-            nvgFill(vg);
+            brls::glass::panel(vg, x, y, w, h, 16, this->getAlpha());
+            brls::glass::tile(vg, x + 14, y + 14, 34, glyph, top, bottom, this->getAlpha());
 
-            text(vg, ctx, x + 16, y + 26, 16, ctx->theme->descriptionColor, label);
-            text(vg, ctx, x + 16, y + 56, 30, ctx->theme->textColor, value);
+            const float inner = w - 28;
+            text(vg, ctx, x + 58, y + 31, 15, ctx->theme->descriptionColor, label, w - 70, 11);
+            text(vg, ctx, x + 14, y + 76, 30, ctx->theme->textColor, value, inner, 16);
             if (bar >= 0.0f) {
                 nvgBeginPath(vg);
-                nvgRoundedRect(vg, x + 16, y + 78, w - 32, 6, 3);
-                nvgFillColor(vg, a(nvgRGB(46, 38, 82)));
+                nvgRoundedRect(vg, x + 14, y + 98, inner, 6, 3);
+                nvgFillColor(vg, a(nvgRGBA(255, 255, 255, 36)));
                 nvgFill(vg);
                 nvgBeginPath(vg);
-                nvgRoundedRect(vg, x + 16, y + 78, std::max(6.0f, (w - 32) * bar), 6, 3);
-                nvgFillColor(vg, a(nvgRGB(jnx::VIOLET_R, jnx::VIOLET_G, jnx::VIOLET_B)));
+                nvgRoundedRect(vg, x + 14, y + 98, std::max(6.0f, inner * bar), 6, 3);
+                nvgFillPaint(vg, nvgLinearGradient(vg, x + 14, 0, x + 14 + inner, 0, a(nvgRGB(jnx::LILAC_R, jnx::LILAC_G, jnx::LILAC_B)), a(nvgRGB(jnx::VIOLET_R, jnx::VIOLET_G, jnx::VIOLET_B))));
                 nvgFill(vg);
-                text(vg, ctx, x + 16, y + 100, 16, ctx->theme->descriptionColor, sub);
+                text(vg, ctx, x + 14, y + 117, 15, ctx->theme->descriptionColor, sub, inner, 11);
             }
             else {
-                text(vg, ctx, x + 16, y + 86, 17, ctx->theme->descriptionColor, sub);
+                text(vg, ctx, x + 14, y + 106, 15, ctx->theme->descriptionColor, sub, inner, 11);
             }
         }
 
@@ -215,7 +233,7 @@ namespace {
         Dashboard() : cat(jnx::catalog())
         {
             this->sys = jnx::readSystem();
-            this->setHeight(256);
+            this->setHeight(262);
         }
 
         ~Dashboard()
@@ -228,41 +246,28 @@ namespace {
         {
             if (!this->logo) {
                 this->vgForLogo = vg;
-                this->logo = nvgCreateImage(vg, "romfs:/jnx_logo.png", 0);
+                this->logo = nvgCreateImage(vg, "romfs:/jnx_logo_white.png", 0);
                 if (!this->logo)
                     this->logo = -1;
             }
 
             const float W = (float)width;
-            const float heroH = 120;
+            const float heroH = 108;
 
-            // --- faixa principal ---
-            NVGpaint grad = nvgLinearGradient(vg, x, y, x + W, y + heroH, nvgRGB(jnx::DEEP_R, jnx::DEEP_G, jnx::DEEP_B), nvgRGB(30, 18, 70));
-            nvgBeginPath(vg);
-            nvgRoundedRect(vg, x, y, W, heroH, 12);
-            nvgFillPaint(vg, grad);
-            nvgFill(vg);
-
-            // estrelinhas de pixel subindo (mesma linguagem do ícone)
-            static const int stars[][3] = {{0, 96, 200}, {12, 74, 150}, {12, 96, 110}, {50, 58, 230}, {62, 80, 160}, {100, 100, 120}, {112, 42, 220},
-                                           {124, 66, 140}, {170, 88, 190}, {182, 28, 120}, {200, 56, 230}, {236, 90, 150}, {260, 34, 110}, {280, 70, 200}};
-            for (const auto& s : stars) {
-                float sx = x + W - 330 + s[0];
-                nvgBeginPath(vg);
-                nvgRect(vg, sx, y + s[1], 6, 6);
-                nvgFillColor(vg, a(nvgRGBA(255, 255, 255, s[2])));
-                nvgFill(vg);
-            }
-
+            // --- faixa principal: painel de vidro com o logo ---
+            brls::glass::panel(vg, x, y, W, heroH, 20, this->getAlpha());
+            const float t = 76;
+            brls::glass::tile(vg, x + 16, y + (heroH - t) / 2, t, brls::glass::NONE, nvgRGB(167, 139, 250), nvgRGB(109, 40, 217), this->getAlpha());
             if (this->logo > 0) {
-                NVGpaint img = nvgImagePattern(vg, x + 20, y + 16, 88, 88, 0, this->logo, this->getAlpha());
+                const float pad = 15;
+                NVGpaint img = nvgImagePattern(vg, x + 16 + pad, y + (heroH - t) / 2 + pad, t - pad * 2, t - pad * 2, 0, this->logo, this->getAlpha());
                 nvgBeginPath(vg);
-                nvgRoundedRect(vg, x + 20, y + 16, 88, 88, 14);
+                nvgRect(vg, x + 16 + pad, y + (heroH - t) / 2 + pad, t - pad * 2, t - pad * 2);
                 nvgFillPaint(vg, img);
                 nvgFill(vg);
             }
-            text(vg, ctx, x + 128, y + 44, 50, nvgRGB(255, 255, 255), "JNX");
-            text(vg, ctx, x + 128, y + 88, 20, nvgRGB(jnx::LILAC_R, jnx::LILAC_G, jnx::LILAC_B), "Pacote de homebrews para Switch");
+            text(vg, ctx, x + 108, y + 38, 38, nvgRGB(255, 255, 255), "JNX");
+            text(vg, ctx, x + 108, y + 76, 18, ctx->theme->descriptionColor, "Pacote de homebrews para Switch", W - 108 - 230, 12);
 
             // estado geral
             Tone tone;
@@ -273,29 +278,30 @@ namespace {
             }
             else if (jnx::hasPackUpdate(sys, cat)) {
                 tone = Tone::Warn;
-                state = sys.installedPack.empty() ? "Pacote não instalado" : "Atualização disponível";
+                state = sys.installedPack.empty() ? "Não instalado" : "Atualização";
             }
             else {
                 tone = Tone::Ok;
-                state = "Tudo em dia";
+                state = "Em dia";
             }
-            chip(vg, ctx, x + W - 20, y + 32, tone, state);
+            chip(vg, ctx, x + W - 18, y + heroH / 2, tone, state);
 
-            // --- cartões ---
-            const float gap = 12, cy = y + heroH + 14, ch = 116;
+            // --- cartões de vidro ---
+            const float gap = 12, cy = y + heroH + 16, ch = 138;
             const float cw = (W - gap * 3) / 4.0f;
 
             std::string packValue = sys.installedPack.empty() ? "—" : sys.installedPack;
-            std::string packSub = !cat.online ? "Não foi possível verificar" : (jnx::hasPackUpdate(sys, cat) ? "Nova: " + cat.pack.version : "Versão mais recente");
-            card(vg, ctx, x, cy, cw, ch, "PACOTE JNX", packValue, packSub, tone);
+            std::string packSub = !cat.online ? "sem conexão" : (jnx::hasPackUpdate(sys, cat) ? "nova: " + cat.pack.version : "versão mais recente");
+            card(vg, ctx, x, cy, cw, ch, brls::glass::PACKAGE, nvgRGB(244, 114, 182), nvgRGB(190, 24, 93), "PACOTE", packValue, packSub);
 
-            card(vg, ctx, x + (cw + gap), cy, cw, ch, "FIRMWARE", sys.firmware, sys.model, Tone::Info);
+            card(vg, ctx, x + (cw + gap), cy, cw, ch, brls::glass::CHIP, nvgRGB(96, 165, 250), nvgRGB(37, 99, 235), "FIRMWARE", sys.firmware, sys.model);
 
-            std::string amsSub = cat.pack.atmosphere.empty() ? "em uso" : "pacote traz " + cat.pack.atmosphere;
-            card(vg, ctx, x + (cw + gap) * 2, cy, cw, ch, "ATMOSPHÈRE", sys.atmosphere, amsSub, Tone::Info);
+            std::string amsSub = cat.pack.atmosphere.empty() ? "em uso" : "pacote: " + cat.pack.atmosphere;
+            card(vg, ctx, x + (cw + gap) * 2, cy, cw, ch, brls::glass::GLOBE, nvgRGB(45, 212, 191), nvgRGB(13, 148, 136), "ATMOSPHÈRE", sys.atmosphere, amsSub);
 
             float used = (sys.sdTotal > 0 && sys.sdFree >= 0) ? 1.0f - (float)sys.sdFree / (float)sys.sdTotal : 0.0f;
-            card(vg, ctx, x + (cw + gap) * 3, cy, cw, ch, "CARTÃO SD", jnx::formatGB(sys.sdFree), sys.sdTotal > 0 ? "livres de " + jnx::formatGB(sys.sdTotal) : "livres", Tone::Info, used);
+            card(vg, ctx, x + (cw + gap) * 3, cy, cw, ch, brls::glass::CARD, nvgRGB(251, 191, 36), nvgRGB(217, 119, 6), "CARTÃO SD", jnx::formatGB(sys.sdFree),
+                 sys.sdTotal > 0 ? "livres de " + jnx::formatGB(sys.sdTotal) : "livres", used);
         }
     };
 

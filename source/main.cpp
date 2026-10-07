@@ -21,7 +21,7 @@ CFW CurrentCfw::running_cfw;
 int main(int argc, char* argv[])
 {
     // Init the app
-    if (!brls::Application::init(APP_TITLE, nullptr, new brls::LibraryViewsThemeVariantsWrapper(new jnx::Theme(), new jnx::Theme()))) {
+    if (!brls::Application::init(APP_TITLE, new jnx::Style(), new brls::LibraryViewsThemeVariantsWrapper(new jnx::Theme(), new jnx::Theme()))) {
         brls::Logger::error("Unable to init Borealis application");
         return EXIT_FAILURE;
     }

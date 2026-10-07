@@ -133,13 +133,7 @@
     "download_firmware": "下载固件",
     "download_cheats": "下载金手指",
     "tools": "工具",
-    "launch_warning": "Bem-vindo ao JNX MOD!
-
-◆ Este aplicativo atualiza o pacote JNX e baixa firmwares, traduções, mods e ferramentas direto do GitHub do JNX.
-◆ Faça um backup do seu emuMMC e do NAND antes de qualquer atualização grande.
-◆ Para evitar corrupção de dados, não use cartão SD formatado em exFAT.
-
-Esta tela não será exibida novamente.",
+    "launch_warning": "Bem-vindo ao JNX MOD!\n\n◆ Este aplicativo atualiza o pacote JNX e baixa firmwares, traduções, mods e ferramentas direto do GitHub do JNX.\n◆ Faça um backup do seu emuMMC e do NAND antes de qualquer atualização grande.\n◆ Para evitar corrupção de dados, não use cartão SD formatado em exFAT.\n\nEsta tela não será exibida novamente.",
     "footer_text": "v{} | {:.1f} GB 可用",
     "theme_warning": "您似乎安装了一个自定义主题，这可能会导致您的系统在升级固件后无法启动。\n请考虑在升级之前将其删除。\n\nDo you wish to proceed regardless?",
     "payloads_label": "\u25c6 下载 RCM payloads 到 {}",

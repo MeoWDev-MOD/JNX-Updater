@@ -26,21 +26,21 @@ namespace jnx {
             this->notificationTextColor = nvgRGB(255, 255, 255);
             this->backdropColor         = nvgRGBA(6, 4, 14, 190);
 
-            this->separatorColor = nvgRGB(139, 92, 246);
+            this->separatorColor = nvgRGBA(255, 255, 255, 46);
 
-            this->sidebarColor          = nvgRGB(19, 15, 36);
+            this->sidebarColor          = nvgRGBA(255, 255, 255, 13);
             this->activeTabColor        = nvgRGB(VIOLET_R, VIOLET_G, VIOLET_B);
-            this->sidebarSeparatorColor = nvgRGB(52, 42, 90);
+            this->sidebarSeparatorColor = nvgRGBA(255, 255, 255, 34);
 
-            this->highlightBackgroundColor = nvgRGB(30, 22, 58);
+            this->highlightBackgroundColor = nvgRGBA(139, 92, 246, 46);
             this->highlightColor1          = nvgRGB(DEEP_R + 32, DEEP_G + 48, DEEP_B + 32);
             this->highlightColor2          = nvgRGB(LILAC_R, LILAC_G, LILAC_B);
 
-            this->listItemSeparatorColor  = nvgRGB(45, 37, 78);
+            this->listItemSeparatorColor  = nvgRGBA(255, 255, 255, 26);
             this->listItemValueColor      = nvgRGB(LILAC_R, LILAC_G, LILAC_B);
             this->listItemFaintValueColor = nvgRGB(96, 88, 128);
 
-            this->tableEvenBackgroundColor = nvgRGB(24, 19, 46);
+            this->tableEvenBackgroundColor = nvgRGBA(255, 255, 255, 14);
             this->tableBodyTextColor       = nvgRGB(160, 152, 196);
 
             this->dropdownBackgroundColor = nvgRGBA(6, 4, 14, 200);
@@ -71,6 +71,29 @@ namespace jnx {
             this->dialogBackdrop             = nvgRGBA(6, 4, 14, 150);
             this->dialogButtonColor          = nvgRGB(LILAC_R, LILAC_G, LILAC_B);
             this->dialogButtonSeparatorColor = nvgRGB(60, 50, 104);
+        }
+    };
+
+    // Proporções do JNX: barra lateral compacta para caber os 9 itens, cantos mais redondos.
+    class Style : public brls::HorizonStyle
+    {
+      public:
+        Style()
+        {
+            this->Sidebar.width        = 380;
+            this->Sidebar.marginLeft   = 36;
+            this->Sidebar.marginRight  = 20;
+            this->Sidebar.marginTop    = 20;
+            this->Sidebar.marginBottom = 16;
+            this->Sidebar.Item.height  = 50;
+            this->Sidebar.Item.textSize = 22;
+            this->Sidebar.Separator.height = 16;
+
+            this->Highlight.strokeWidth  = 3;
+            this->Highlight.cornerRadius = 14.0f;
+
+            this->List.marginLeftRight = 34;
+            this->List.marginTopBottom = 24;
         }
     };
 
