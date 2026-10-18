@@ -13,14 +13,14 @@ constexpr const char RCM_PAYLOAD_PATH[] = "romfs:/aio_rcm.bin";
 constexpr const char MARIKO_PAYLOAD_PATH[] = "/payload.bin";
 constexpr const char MARIKO_PAYLOAD_PATH_TEMP[] = "/payload.bin.aio";
 
-constexpr const char CHANGELOG_URL[] = "https://github.com/vendashson-rgb/JNX/releases";
+constexpr const char CHANGELOG_URL[] = "https://github.com/MeoWDev-MOD/JNX/releases";
 
-constexpr const char APP_URL[] = "https://github.com/vendashson-rgb/JNX-Updater/releases/latest/download/jnx-update.zip";
-constexpr const char TAGS_INFO[] = "https://api.github.com/repos/vendashson-rgb/JNX-Updater/releases/latest";
+constexpr const char APP_URL[] = "https://github.com/MeoWDev-MOD/JNX-Updater/releases/latest/download/jnx-update.zip";
+constexpr const char TAGS_INFO[] = "https://api.github.com/repos/MeoWDev-MOD/JNX-Updater/releases/latest";
 constexpr const char APP_FILENAME[] = "/config/jnx-update/app.zip";
 
-constexpr const char NXLINKS_URL[] = "https://raw.githubusercontent.com/vendashson-rgb/JNX/main/jnx-links.json";
-constexpr const char JNX_LINKS_URL[] = "https://raw.githubusercontent.com/vendashson-rgb/JNX/main/jnx-links.json";
+constexpr const char NXLINKS_URL[] = "https://raw.githubusercontent.com/MeoWDev-MOD/JNX/main/jnx-links.json";
+constexpr const char JNX_LINKS_URL[] = "https://raw.githubusercontent.com/MeoWDev-MOD/JNX/main/jnx-links.json";
 constexpr const char JNX_INFO_FILE[] = "/jnx.txt";
 constexpr const char JNX_PACK_FILENAME[] = "/config/jnx-update/pacote-jnx.zip";
 constexpr const char JNX_ITEM_FILENAME[] = "/config/jnx-update/item.zip";

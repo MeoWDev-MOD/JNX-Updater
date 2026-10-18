@@ -524,5 +524,5 @@ JnxAboutTab::JnxAboutTab()
     this->addView(note("◆ Este aplicativo é baseado no AIO-Switch-Updater, de HamletDuFromage (GPL-3.0).\n◆ Interface: Borealis, de natinusala.\n◆ Cheats: nx-cheats-db (sthetix) e CheatSlips.\n◆ Bootloader de payload: Team Neptune (TegraExplorer)."));
 
     this->addView(new brls::Header("Aviso"));
-    this->addView(note("◆ O JNX não detém direitos sobre nenhum arquivo listado; todo o crédito pertence aos seus autores.\n◆ O JNX não inclui sigpatches, chaves, firmwares, jogos nem ROMs.\n◆ Código-fonte (GPL-3.0): github.com/vendashson-rgb/JNX-Updater"));
+    this->addView(note("◆ O JNX não detém direitos sobre nenhum arquivo listado; todo o crédito pertence aos seus autores.\n◆ O JNX não inclui sigpatches, chaves, firmwares, jogos nem ROMs.\n◆ Código-fonte (GPL-3.0): github.com/MeoWDev-MOD/JNX-Updater"));
 }
