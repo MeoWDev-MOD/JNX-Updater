@@ -2,6 +2,8 @@
 
 # JNX MOD (jnx-update)
 
+🌐 **[Read in English](README.en.md)**
+
 Aplicativo (homebrew `.nro`) do pacote [JNX](https://github.com/MeoWDev-MOD/JNX): atualiza o pacote e baixa
 firmwares, traduções, modificações, ferramentas e cheats direto do GitHub do JNX, sem passar pelo PC.
 
